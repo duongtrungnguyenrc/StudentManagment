@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="preloaded_fonts" translatable="false">
+        <item>@font/alex_brush</item>
+        <item>@font/architects_daughter</item>
+        <item>@font/asul_bold</item>
+        <item>@font/farsan</item>
+        <item>@font/poppins</item>
+        <item>@font/poppins_medium</item>
+    </array>
+</resources>

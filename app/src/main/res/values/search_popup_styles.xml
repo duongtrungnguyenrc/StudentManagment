@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="PopupBackgroundAnimation">
+        <item name="android:windowEnterAnimation">@anim/slowly_visible</item>
+        <item name="android:windowExitAnimation">@anim/slowly_hidden</item>
+    </style>
+
+    <style name="PopupAnimation">
+        <item name="android:windowEnterAnimation">@anim/slide_in_up</item>
+        <item name="android:windowExitAnimation">@anim/slide_out_down</item>
+    </style>
+
+</resources>
