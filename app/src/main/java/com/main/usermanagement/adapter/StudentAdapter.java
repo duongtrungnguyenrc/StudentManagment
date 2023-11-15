@@ -3,14 +3,14 @@ package com.main.usermanagement.adapter;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.PopupMenu;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,6 +23,7 @@ import com.main.usermanagement.callback.AddStudentCallback;
 import com.main.usermanagement.callback.DeleteStudentCallback;
 import com.main.usermanagement.models.Student;
 import com.main.usermanagement.services.StudentService;
+import com.main.usermanagement.ui.activities.StudentDetailActivity;
 
 import java.util.List;
 
@@ -31,8 +32,10 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.ViewHold
     private Context context;
     private List<Student> students;
     private StudentService service;
+
     public StudentAdapter(Context context) {
         this.context = context;
+        service = new StudentService();
     }
 
     public List<Student> getStudents() {
@@ -48,19 +51,19 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.ViewHold
         private View view;
         private TextView txtName;
         private TextView txtPhone;
-        private TextView txtAge;
+        private TextView txtStatus;
 
 
         public ViewHolder(View view) {
             super(view);
             this.view = view;
             this.txtName = (TextView) view.findViewById(R.id.txt_name);
-            this.txtAge = (TextView) view.findViewById(R.id.txt_age);
+            this.txtStatus = (TextView) view.findViewById(R.id.txt_status);
             this.txtPhone = (TextView) view.findViewById(R.id.txt_phone);
         }
 
-        public TextView getTxtAge() {
-            return txtAge;
+        public TextView getTxtStatus() {
+            return txtStatus;
         }
 
         public TextView getTxtName() {
@@ -80,16 +83,23 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.ViewHold
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int position) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.student_layout, parent, false);
+                .inflate(R.layout.layout_student, parent, false);
 
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.getTxtName().setText(students.get(position).getName());
-        holder.getTxtPhone().setText(students.get(position).getPhone());
-        holder.getTxtAge().setText(students.get(position).getStatus().toString());
+        Student student = students.get(position);
+        holder.getTxtName().setText(student.getName());
+        holder.getTxtPhone().setText(student.getPhone());
+        holder.getTxtStatus().setText(student.getStatus().toString());
+
+        holder.getView().setOnClickListener(view -> {
+            Intent intent = new Intent(context, StudentDetailActivity.class);
+            intent.putExtra("student_id", student.getId());
+            context.startActivity(intent);
+        });
 
         holder.getView().setOnLongClickListener(listener -> {
             showPopupMenu(context, holder.getView(), position);
@@ -106,22 +116,19 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.ViewHold
         PopupMenu popupMenu = new PopupMenu(context, anchorView);
         popupMenu.inflate(R.menu.student_option_menu);
         popupMenu.setGravity(Gravity.RIGHT);
-        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                int itemId = menuItem.getItemId();
+        popupMenu.setOnMenuItemClickListener(menuItem -> {
+            int itemId = menuItem.getItemId();
 
-                if (itemId == R.id.menu_detail) {
-                    // Handle menu_detail click
-                } else if (itemId == R.id.menu_update) {
-                    // Handle menu_update click
-                }else if (itemId == R.id.menu_delete) {
-                    deleteStudent(index);
-                } else {
-                    return false;
-                }
-                return true;
+            if (itemId == R.id.menu_detail) {
+                // Handle menu_detail click
+            } else if (itemId == R.id.menu_update) {
+                // Handle menu_update click
+            } else if (itemId == R.id.menu_delete) {
+                deleteStudent(index);
+            } else {
+                return false;
             }
+            return true;
         });
         popupMenu.show();
     }
@@ -141,8 +148,8 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.ViewHold
     }
 
     public void deleteStudent(int position) {
-        service = new StudentService();
         final Student student = students.get(position);
+
         new AlertDialog.Builder(context)
             .setMessage("Delete " + student.getName() + " ?")
             .setPositiveButton(android.R.string.yes, (dialog, whichButton) -> {
@@ -171,8 +178,6 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.ViewHold
                     }
             });
         })
-        .setNegativeButton(android.R.string.no, (dialog, whichButton) -> {
-
-        }).show();
+        .setNegativeButton(android.R.string.no, null).show();
     }
 }

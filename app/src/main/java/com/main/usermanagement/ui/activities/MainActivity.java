@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
                 loadFragment(new DashboardFragment());
                 return true;
             }
-            else if(item.getItemId() == R.id.action_home) {
+            else if(item.getItemId() == R.id.action_certificate) {
                 loadFragment(new HomeFragment());
                 return true;
             }

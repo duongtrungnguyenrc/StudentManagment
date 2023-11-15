@@ -12,12 +12,14 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
+import android.widget.PopupWindow;
 import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -124,7 +126,7 @@ public class DashboardFragment extends Fragment {
     private void showSkeleton() {
         this.skeletonScreen = Skeleton.bind(studentRecyclerView)
                 .adapter(this.adapter)
-                .load(R.layout.skeleton_student_layout)
+                .load(R.layout.layout_skeleton_student)
                 .count(10)
                 .duration(500)
                 .show();

@@ -6,4 +6,5 @@
     <color name="light_transparent">#16000000</color>
     <color name="dark_transparent">#24000000</color>
     <color name="bg_login_1_background">#FFFFFF</color>
+    <color name="primary_blue">#0386D0</color>
 </resources>

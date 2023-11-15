@@ -109,7 +109,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:backgroundTint="#0386D0"
+                android:backgroundTint="@color/primary_blue"
                 android:fontFamily="@font/poppins_medium"
                 android:padding="10dp"
                 android:text="Login"

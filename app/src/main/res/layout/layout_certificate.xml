@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:gravity="center_vertical"
     android:orientation="vertical">
 
@@ -31,23 +32,24 @@
                 android:id="@+id/txt_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Duong Trung Nguyen"
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/txt_phone"
+                android:id="@+id/txt_description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:text="duongtrungnguyenrc@gmail.com"
                 android:textSize="12sp" />
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/txt_age"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="1800102" />
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:padding="5dp"
+            android:src="@drawable/ic_certificate_dark_24"
+            app:civ_border_color="#f0eff8"
+            app:civ_border_width="7dp"
+            app:civ_circle_background_color="#f0eff8" />
 
     </LinearLayout>
 

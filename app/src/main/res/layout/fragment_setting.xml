@@ -70,13 +70,13 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:background="@android:color/transparent"
-                    android:src="@drawable/ic_pen" />
+                    android:src="@drawable/ic_pen_light_32" />
 
             </LinearLayout>
 
 
             <TextView
-                android:id="@+id/lb_account_group"
+                android:id="@+id/txt_student_info_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
@@ -88,7 +88,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/linearLayout2" />
 
             <LinearLayout
-                android:id="@+id/lo_settings"
+                android:id="@+id/layout_student_info"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
@@ -97,7 +97,7 @@
                 android:orientation="vertical"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/lb_account_group">
+                app:layout_constraintTop_toBottomOf="@+id/txt_student_info_label">
 
                 <LinearLayout
                     android:id="@+id/item_account"
@@ -311,7 +311,7 @@
             </LinearLayout>
 
             <TextView
-                android:id="@+id/lb_more_group"
+                android:id="@+id/txt_certificates_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
@@ -320,7 +320,7 @@
                 android:textSize="16sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/lo_settings" />
+                app:layout_constraintTop_toBottomOf="@+id/layout_student_info" />
 
             <LinearLayout
                 android:id="@+id/lo_more"
@@ -331,7 +331,7 @@
                 android:orientation="vertical"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/lb_more_group">
+                app:layout_constraintTop_toBottomOf="@+id/txt_certificates_label">
 
                 <LinearLayout
                     android:layout_width="match_parent"

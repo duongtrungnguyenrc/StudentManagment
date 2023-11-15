@@ -1,27 +1,36 @@
 package com.main.usermanagement.models;
 
 public class Certificate {
+    private String id;
     private String name;
-    private String time;
+    private String description;
 
-    public Certificate(String name, String time) {
+    public Certificate(){};
+
+    public Certificate(String name, String description) {
         this.name = name;
-        this.time = time;
+        this.description = description;
+    }
+
+    public Certificate(String id, String name, String description) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+    }
+
+    public String getId() {
+        return id;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public String getDescription() {
+        return description;
     }
 
-    public String getTime() {
-        return time;
-    }
-
-    public void setTime(String time) {
-        this.time = time;
+    public void setId(String id) {
+        this.id = id;
     }
 }

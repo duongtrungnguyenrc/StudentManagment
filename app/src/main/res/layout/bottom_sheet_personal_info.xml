@@ -7,7 +7,6 @@
     android:background="@android:color/transparent"
     android:padding="0dp">
 
-    <!-- Nội dung của popup ở đây -->
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -88,7 +87,7 @@
             app:layout_constraintTop_toBottomOf="@+id/txt_heading_email" />
 
         <EditText
-            android:id="@+id/editTextDate"
+            android:id="@+id/edt_age"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
@@ -116,10 +115,10 @@
             android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/editTextDate" />
+            app:layout_constraintTop_toBottomOf="@+id/edt_age" />
 
         <EditText
-            android:id="@+id/editTextPhone"
+            android:id="@+id/edt_phone"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
@@ -148,7 +147,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/editTextPhone" />
+            app:layout_constraintTop_toBottomOf="@+id/edt_phone" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

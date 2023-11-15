@@ -4,16 +4,13 @@
 
     <item
         android:id="@+id/menu_detail"
-        android:title="Detail"
-        android:icon="@drawable/ic_trash_dark_24" />
+        android:title="Detail" />
 
     <item
         android:id="@+id/menu_update"
-        android:title="Update"
-        android:icon="@drawable/ic_trash_dark_24" />
+        android:title="Update" />
 
     <item
         android:id="@+id/menu_delete"
-        android:title="Delete"
-        android:icon="@drawable/ic_trash_dark_24" />
+        android:title="Delete" />
 </menu>

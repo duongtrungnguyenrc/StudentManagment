@@ -79,10 +79,10 @@ public class SettingFragment extends Fragment {
 
 
     private void showPopup(View anchorView) {
-        View popupView = getLayoutInflater().inflate(R.layout.personal_info_sheet, null);
+        View popupView = getLayoutInflater().inflate(R.layout.bottom_sheet_personal_info, null);
 
         final PopupWindow background = new PopupWindow(
-                getLayoutInflater().inflate(R.layout.personal_info_sheet_background, null),
+                getLayoutInflater().inflate(R.layout.bottom_sheet_background, null),
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
         );

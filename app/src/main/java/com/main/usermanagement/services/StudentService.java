@@ -16,6 +16,8 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.main.usermanagement.callback.AddStudentCallback;
 import com.main.usermanagement.callback.AuthenticationCallback;
 import com.main.usermanagement.callback.DeleteStudentCallback;
+import com.main.usermanagement.callback.GetStudentByIdCallback;
+import com.main.usermanagement.callback.UpdateStudentCallback;
 import com.main.usermanagement.models.Student;
 import com.main.usermanagement.models.enumerations.EStatus;
 
@@ -46,34 +48,39 @@ public class StudentService {
         List<Student> students = new ArrayList<>();
 
         studentsCollection.get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                Student student = document.toObject(Student.class);
-                                student.setId(document.getId());
-                                students.add(student);
-                            }
-                            listener.onDataRetrieved(students);
-                        } else {
-                            Log.d(TAG, "Error getting documents: ", task.getException());
-                            listener.onError(task.getException());
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            Student student = document.toObject(Student.class);
+                            student.setId(document.getId());
+                            students.add(student);
                         }
+                        listener.onDataRetrieved(students);
+                    } else {
+                        Log.d(TAG, "Error getting documents: ", task.getException());
+                        listener.onError(task.getException());
                     }
                 });
     }
 
 
-    public void getStudentById(String studentId, OnCompleteListener<DocumentSnapshot> onCompleteListener) {
-        studentsCollection.document(studentId).get().addOnCompleteListener(onCompleteListener);
+    public void getStudentById(String studentId, GetStudentByIdCallback action) {
+        studentsCollection.document(studentId).get().addOnCompleteListener(task -> {
+            if(task.isSuccessful()) {
+                Student student = task.getResult().toObject(Student.class);
+                student.setId(task.getResult().getId());
+                action.onSuccess(student);
+            }
+            else {
+                action.onError(task.getException());
+            }
+        });
     }
 
     public void addStudent(String name, int age, String phone, EStatus status, AddStudentCallback action) {
         Student student = new Student(name, age, phone, status);
             studentsCollection.add(student).addOnCompleteListener(task -> {
                 if(task.isSuccessful()) {
-                    task.getResult();
                     action.onSuccess();
                 }
                 else {
@@ -86,7 +93,6 @@ public class StudentService {
         Student student = new Student(name, age, phone, status);
         studentsCollection.document(id).set(student).addOnCompleteListener(task -> {
             if(task.isSuccessful()) {
-                task.getResult();
                 action.onSuccess();
             }
             else {
@@ -95,12 +101,25 @@ public class StudentService {
         });
     }
 
-    public void updateStudent(String studentId, String name, Date birth, String phone, EStatus status) {
+    public void updateStudent(String studentId, String name, int age, String phone, UpdateStudentCallback action) {
         Map<String, Object> updates = new HashMap<>();
         updates.put("name", name);
-        updates.put("birth", birth);
+        updates.put("age", age);
         updates.put("phone", phone);
-        updates.put("status", status);
+
+        studentsCollection.document(studentId).update(updates).addOnCompleteListener(task -> {
+            if(task.isSuccessful()) {
+                action.onSuccess();
+            }
+            else {
+                action.onError(task.getException());
+            }
+        });
+    }
+
+    public void lockStudent(String studentId) {
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("status", EStatus.LOCKED);
 
         studentsCollection.document(studentId).update(updates);
     }
