@@ -1,4 +1,4 @@
-package com.main.usermanagement.models;
+package com.main.usermanagement.models.entities;
 
 public class Certificate {
     private String id;

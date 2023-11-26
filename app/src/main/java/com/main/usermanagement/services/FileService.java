@@ -8,7 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.loader.content.AsyncTaskLoader;
 
-import com.main.usermanagement.models.Student;
+import com.main.usermanagement.models.entities.Student;
 
 import java.io.File;
 import java.io.FileWriter;

@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,14 +24,18 @@ import android.widget.Toast;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.FirebaseApp;
 import com.main.usermanagement.R;
+import com.main.usermanagement.callback.ActionCallback;
+import com.main.usermanagement.callback.BottomSheetActionHandlerCallback;
+import com.main.usermanagement.callback.RecyclerViewActionCallback;
 import com.main.usermanagement.callback.SwipeToDeleteCallback;
 import com.main.usermanagement.models.enumerations.EStudentSortDirection;
 import com.main.usermanagement.services.DebounceService;
 import com.main.usermanagement.services.FileService;
 import com.main.usermanagement.ui.activities.AddStudentActivity;
 import com.main.usermanagement.adapter.StudentAdapter;
-import com.main.usermanagement.models.Student;
+import com.main.usermanagement.models.entities.Student;
 import com.main.usermanagement.services.StudentService;
+import com.main.usermanagement.ui.components.BottomSheet;
 import com.main.usermanagement.ui.skeleton.Skeleton;
 import com.main.usermanagement.ui.skeleton.SkeletonScreen;
 
@@ -44,18 +47,22 @@ import java.util.stream.Collectors;
 public class DashboardFragment extends Fragment {
 
     private FloatingActionButton fltBtnAdd;
-
     private ImageButton btnSearchMenu;
-
     private EditText edtSearch;
-
     private RecyclerView studentRecyclerView;
-
     private  SkeletonScreen skeletonScreen;
-
     private StudentAdapter adapter;
     private StudentService service;
 
+    public static class Init {
+        private static DashboardFragment instance = null;
+        public static DashboardFragment getInstance() {
+            if(instance == null) {
+                instance = new DashboardFragment();
+            }
+            return instance;
+        }
+    }
 
     public DashboardFragment() {
     }
@@ -81,7 +88,49 @@ public class DashboardFragment extends Fragment {
             startActivityForResult(intent, 111);
         });
 
-        this.adapter = new StudentAdapter(getContext());
+        this.adapter = new StudentAdapter(getContext(), new RecyclerViewActionCallback<List<Student>>() {
+            boolean currStatus = false;
+
+            @Override
+            public void onHasItemChecked(List<Student> checkedStudents) {
+                if(checkedStudents.size() > 0 && !currStatus) {
+                    currStatus = true;
+                }
+                if(currStatus) {
+                    BottomSheet actionControlBottomSheet = new BottomSheet(
+                            R.layout.bottom_sheet_action_control,
+                            getActivity().getWindow().getDecorView().getRootView(),
+                            getLayoutInflater(),
+                            false
+                    );
+
+                    actionControlBottomSheet.showBottomSheet((popupView, popupWindow, background) -> {
+                        popupView.findViewById(R.id.btn_remove).setOnClickListener(view -> {
+                            checkedStudents.forEach(student -> {
+                                service.deleteStudent(student.getId(), new ActionCallback<Object>() {
+                                    @Override
+                                    public void onSuccess() {
+                                        ActionCallback.super.onSuccess();
+                                        Toast.makeText(getActivity(), "successfully to delete " + student.getName(), Toast.LENGTH_LONG).show();
+                                    }
+
+                                    @Override
+                                    public void onError(Exception e) {
+                                        ActionCallback.super.onError(e);
+                                        Toast.makeText(getActivity(), "Failed to delete: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                                    }
+
+                                    @Override
+                                    public void onFailure(String message) {
+                                        Toast.makeText(getContext(), "Delete student failed: " + message, Toast.LENGTH_LONG).show();
+                                    }
+                                });
+                            });
+                        });
+                    });
+                }
+            }
+        });
         studentRecyclerView.setAdapter(adapter);
         studentRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         enableSwipeToDelete();
@@ -96,6 +145,11 @@ public class DashboardFragment extends Fragment {
         });
 
         return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
     }
 
     @Override
@@ -181,7 +235,7 @@ public class DashboardFragment extends Fragment {
             }else if (itemId == R.id.menu_export_file) {
                 FileService fileService = new FileService(getContext(), adapter.getStudents());
                 fileService.registerListener(0, (loader, data) -> {
-                    if (data) {
+                    if (Boolean.TRUE.equals(data)) {
                         Toast.makeText(getContext(), "CSV file exported successfully", Toast.LENGTH_SHORT).show();
                     } else {
                         Toast.makeText(getContext(), "CSV file export failed", Toast.LENGTH_SHORT).show();
@@ -200,13 +254,9 @@ public class DashboardFragment extends Fragment {
     private void sortStudents(@NonNull EStudentSortDirection direction) {
         List<Student> sortedList = new ArrayList<>(this.adapter.getStudents());
 
-        switch (direction){
-            case ASCENDING:
-                sortedList.sort(Comparator.comparing(Student::getName).reversed());
-                break;
-            case DESCENDING:
-                sortedList.sort(Comparator.comparing(Student::getName));
-                break;
+        switch (direction) {
+            case ASCENDING -> sortedList.sort(Comparator.comparing(Student::getName).reversed());
+            case DESCENDING -> sortedList.sort(Comparator.comparing(Student::getName));
         }
         this.adapter.setStudents(sortedList);
     }

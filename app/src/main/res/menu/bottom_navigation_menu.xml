@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/action_certificate"
-        android:icon="@drawable/ic_certificate_dark_32"
-        android:title="Certificate" />
-
-    <item
         android:id="@+id/action_dashboard"
         android:icon="@drawable/ic_dashboard_dark_32"
         android:title="Dashboard" />
-
+    <item
+        android:id="@+id/action_certificate"
+        android:icon="@drawable/ic_certificate_dark_32"
+        android:title="Certificate" />
     <item
         android:id="@+id/action_setting"
         android:icon="@drawable/ic_setting_32"

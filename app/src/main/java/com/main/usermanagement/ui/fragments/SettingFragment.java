@@ -1,112 +1,157 @@
 package com.main.usermanagement.ui.fragments;
 
+import static android.app.Activity.RESULT_OK;
+
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.PopupWindow;
 
+import com.bumptech.glide.Glide;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.main.usermanagement.R;
+import com.main.usermanagement.adapter.AccessHistoryAdapter;
+import com.main.usermanagement.callback.ActionCallback;
+import com.main.usermanagement.databinding.FragmentSettingBinding;
+import com.main.usermanagement.models.entities.UserProfile;
+import com.main.usermanagement.models.enumerations.ERole;
+import com.main.usermanagement.services.UserService;
+import com.main.usermanagement.ui.activities.GrantAccountActivity;
 import com.main.usermanagement.ui.activities.LoginActivity;
+import com.main.usermanagement.ui.activities.userInformationActivity;
+import com.main.usermanagement.ui.components.BottomSheet;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link SettingFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class SettingFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    public static class Init {
+        private static SettingFragment instance = null;
+        public static SettingFragment getInstance() {
+            if(instance == null) {
+                instance = new SettingFragment();
+            }
+            return instance;
+        }
+    }
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    public FragmentSettingBinding binding;
+
+    private FirebaseUser currentUser;
 
     public SettingFragment() {
     }
-
-    public static SettingFragment newInstance(String param1, String param2) {
-        SettingFragment fragment = new SettingFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+        this.currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_setting, container, false);
+        this.binding = FragmentSettingBinding.inflate(inflater);
 
-        view.findViewById(R.id.item_account).setOnClickListener(item -> {
-            showPopup(getView());
+        binding.itemAccount.setOnClickListener(item -> {
+            Intent intent = new Intent(getContext(), userInformationActivity.class);
+            startActivityForResult(intent, 1);
         });
 
-        view.findViewById(R.id.item_log_out).setOnClickListener(item -> {
+        binding.itemGrantAccount.setOnClickListener(item -> {
+            Intent intent = new Intent(getContext(), GrantAccountActivity.class);
+            startActivityForResult(intent, 1);
+        });
+
+        binding.itemLogOut.setOnClickListener(item -> {
             new AlertDialog.Builder(getContext())
                     .setMessage("Log out your account?")
-                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int whichButton) {
-                            Intent intent = new Intent(getActivity(), LoginActivity.class);
-                            startActivity(intent);
-                            getActivity().finish();
-                        }})
+                    .setPositiveButton(android.R.string.yes, (dialog, whichButton) -> {
+                        Intent intent = new Intent(getActivity(), LoginActivity.class);
+                        startActivity(intent);
+                        getActivity().finish();
+                    })
                     .setNegativeButton(android.R.string.no, null).show();
-
         });
 
-        return view;
+        binding.itemAccessHistory.setOnClickListener(v -> {
+            BottomSheet userAccessHistoryBottomSheet = new BottomSheet(
+                    R.layout.bottom_sheet_access_history,
+                    v,
+                    getLayoutInflater(),
+                    true
+            );
+
+            userAccessHistoryBottomSheet.showBottomSheet((popupView, popupWindow, background) -> {
+                accessHistoryActionHandler(popupView, userAccessHistoryBottomSheet);
+            });
+        });
+
+        return binding.getRoot();
     }
 
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        loadUser();
+    }
 
-    private void showPopup(View anchorView) {
-        View popupView = getLayoutInflater().inflate(R.layout.bottom_sheet_personal_info, null);
+    public void loadUser() {
+        if (currentUser != null)
+            new UserService(getContext()).getUserProfile(currentUser.getUid(), new ActionCallback<UserProfile>() {
+                @SuppressLint("SetTextI18n")
+                @Override
+                public void onSuccess(UserProfile profile) {
+                    binding.txtPlaceholderName.setText(profile.getName());
+                    binding.txtPlaceholderEmail.setText("@" + currentUser.getUid());
+                    Context context = getActivity();
+                    if(profile.getImage() != null && !profile.getImage().isEmpty() && context != null) {
+                        Glide.with(context)
+                                .load(profile.getImage())
+                                .into(binding.imgPlaceholderAvatar);
+                    }
+                    if (profile.getRole() != ERole.ROLE_ADMIN )
+                        binding.layoutMoreSetting.setVisibility(View.GONE);
+                    binding.layoutLoading.setVisibility(View.GONE);
+                }
+            });
+    }
 
-        final PopupWindow background = new PopupWindow(
-                getLayoutInflater().inflate(R.layout.bottom_sheet_background, null),
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
-        );
+    public void accessHistoryActionHandler(View popupView, BottomSheet bottomSheet) {
+        RecyclerView userAccessHistoryRecyclerView = popupView.findViewById(R.id.recycler_view_access_history);
 
-        background.setAnimationStyle(R.style.PopupBackgroundAnimation);
+        new UserService(getContext()).getUserProfile(currentUser.getUid(), new ActionCallback<UserProfile>() {
+            @Override
+            public void onSuccess(UserProfile profile) {
+                ActionCallback.super.onSuccess(profile);
 
+                AccessHistoryAdapter adapter = new AccessHistoryAdapter(getContext(), profile.getAccessHistory());
+                userAccessHistoryRecyclerView.setAdapter(adapter);
+                userAccessHistoryRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+            }
 
-        final PopupWindow popupWindow = new PopupWindow(
-                popupView,
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
-        );
-        popupWindow.setAnimationStyle(R.style.PopupAnimation);
-
-        int[] location = new int[2];
-        anchorView.getLocationOnScreen(location);
-        background.showAtLocation(anchorView, Gravity.TOP, location[0], location[1]);
-        popupWindow.showAtLocation(anchorView, Gravity.TOP, location[0], location[1]);
-
-        popupView.findViewById(R.id.btn_dismiss).setOnClickListener(view -> {
-            background.dismiss();
-            popupWindow.dismiss();
-
+            @Override
+            public void onError(Exception e) {
+                ActionCallback.super.onError(e);
+            }
         });
 
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == 1 && resultCode == RESULT_OK) {
+            loadUser();
+        }
     }
 }

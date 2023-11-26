@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#EEECEC</color>
+    <color name="black">#000</color>
+    <color name="white">#fff</color>
     <color name="shimmer_color">#FFF7F5F5</color>
     <color name="light_transparent">#16000000</color>
     <color name="dark_transparent">#24000000</color>
-    <color name="bg_login_1_background">#FFFFFF</color>
-    <color name="primary_blue">#0386D0</color>
+    <color name="primary_color">#000</color>
 </resources>

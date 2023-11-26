@@ -7,8 +7,8 @@
         android:title="Detail" />
 
     <item
-        android:id="@+id/menu_update"
-        android:title="Update" />
+        android:id="@+id/menu_lock"
+        android:title="Lock/Unlock" />
 
     <item
         android:id="@+id/menu_delete"

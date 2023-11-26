@@ -22,12 +22,10 @@ public class DebounceService implements TextWatcher {
 
     @Override
     public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-        // Not used in this example
     }
 
     @Override
     public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-        // Not used in this example
     }
 
     @Override
