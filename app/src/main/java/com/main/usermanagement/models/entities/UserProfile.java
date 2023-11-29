@@ -1,7 +1,9 @@
-package com.main.usermanagement.models.entities;
+package com.main.usermanagement.models.entities;//package com.main.usermanagement.models.entities;
 
 
 import android.net.Uri;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.main.usermanagement.models.enumerations.ERole;
 import com.main.usermanagement.models.enumerations.EStatus;
@@ -10,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class UserProfile {
+public class UserProfile implements Parcelable {
     private String name;
     private int age;
     private String phone;
@@ -19,7 +21,7 @@ public class UserProfile {
     private String image;
     private List<Date> accessHistory = new ArrayList<>();
 
-    public UserProfile(){}
+    public UserProfile() {}
 
     public UserProfile(String name, int age, String phone, EStatus status, ERole role, String image) {
         this.name = name;
@@ -28,6 +30,45 @@ public class UserProfile {
         this.status = status;
         this.role = role;
         this.image = image;
+    }
+
+    protected UserProfile(Parcel in) {
+        name = in.readString();
+        age = in.readInt();
+        phone = in.readString();
+        status = EStatus.valueOf(in.readString());
+        role = ERole.valueOf(in.readString());
+        image = in.readString();
+        accessHistory = new ArrayList<>();
+        in.readList(accessHistory, Date.class.getClassLoader());
+    }
+
+    public static final Creator<UserProfile> CREATOR = new Creator<UserProfile>() {
+        @Override
+        public UserProfile createFromParcel(Parcel in) {
+            return new UserProfile(in);
+        }
+
+        @Override
+        public UserProfile[] newArray(int size) {
+            return new UserProfile[size];
+        }
+    };
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(name);
+        dest.writeInt(age);
+        dest.writeString(phone);
+        dest.writeString(status.name());
+        dest.writeString(role.name());
+        dest.writeString(image);
+        dest.writeList(accessHistory);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     public String getName() {
@@ -65,7 +106,6 @@ public class UserProfile {
     public ERole getRole() {
         return role;
     }
-
 
     public void setRole(ERole role) {
         this.role = role;

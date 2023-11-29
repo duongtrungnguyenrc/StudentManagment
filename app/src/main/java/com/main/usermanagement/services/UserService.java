@@ -8,6 +8,7 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -17,6 +18,7 @@ import com.main.usermanagement.models.entities.UserProfile;
 import com.main.usermanagement.models.enumerations.ERole;
 
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -157,5 +159,20 @@ public class UserService {
 
     public static ERole getCurrRole() {
         return currRole;
+    }
+
+    public void getAllUsers(ActionCallback<List<UserProfile>> action) {
+        userProfileCollection.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                List<UserProfile> users = new ArrayList<>();
+                for (DocumentSnapshot document : task.getResult()) {
+                    UserProfile profile = document.toObject(UserProfile.class);
+                    users.add(profile);
+                }
+                action.onSuccess(users);
+            } else {
+                action.onError(task.getException());
+            }
+        });
     }
 }

@@ -30,6 +30,8 @@ import com.main.usermanagement.models.enumerations.ERole;
 import com.main.usermanagement.services.UserService;
 import com.main.usermanagement.ui.activities.GrantAccountActivity;
 import com.main.usermanagement.ui.activities.LoginActivity;
+import com.main.usermanagement.ui.activities.UserDetailActivity;
+import com.main.usermanagement.ui.activities.UserListActivity;
 import com.main.usermanagement.ui.activities.userInformationActivity;
 import com.main.usermanagement.ui.components.BottomSheet;
 
@@ -64,6 +66,11 @@ public class SettingFragment extends Fragment {
 
         binding.itemAccount.setOnClickListener(item -> {
             Intent intent = new Intent(getContext(), userInformationActivity.class);
+            startActivityForResult(intent, 1);
+        });
+
+        binding.itemAuthentication.setOnClickListener(item -> {
+            Intent intent = new Intent(getContext(), UserListActivity.class);
             startActivityForResult(intent, 1);
         });
 
