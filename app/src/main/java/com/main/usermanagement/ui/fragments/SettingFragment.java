@@ -133,6 +133,8 @@ public class SettingFragment extends Fragment {
             });
     }
 
+
+
     public void accessHistoryActionHandler(View popupView, BottomSheet bottomSheet) {
         RecyclerView userAccessHistoryRecyclerView = popupView.findViewById(R.id.recycler_view_access_history);
 

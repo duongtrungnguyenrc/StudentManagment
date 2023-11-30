@@ -52,11 +52,13 @@ public class UserListActivity extends AppCompatActivity {
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                SettingFragment settingFragment = new SettingFragment();
-                getSupportFragmentManager().beginTransaction()
-                        .replace(android.R.id.content, settingFragment)
-                        .addToBackStack(null)
-                        .commit();
+//                SettingFragment settingFragment = new SettingFragment();
+//                getSupportFragmentManager().beginTransaction()
+//                        .replace(android.R.id.content, settingFragment)
+//                        .addToBackStack(null)
+//                        .commit();
+                Intent intent = new Intent(UserListActivity.this, MainActivity.class);
+                startActivity(intent);
             }
         });
     }
