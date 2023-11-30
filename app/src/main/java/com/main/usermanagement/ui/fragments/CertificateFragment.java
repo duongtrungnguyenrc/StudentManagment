@@ -23,7 +23,9 @@ import com.main.usermanagement.callback.ActionCallback;
 import com.main.usermanagement.callback.SwipeToDeleteCallback;
 import com.main.usermanagement.databinding.FragmentCertificateBinding;
 import com.main.usermanagement.models.entities.Certificate;
+import com.main.usermanagement.models.enumerations.ERole;
 import com.main.usermanagement.services.CertificateService;
+import com.main.usermanagement.services.UserService;
 import com.main.usermanagement.ui.activities.CreateCertificateActivity;
 import com.main.usermanagement.ui.skeleton.Skeleton;
 import com.main.usermanagement.ui.skeleton.SkeletonScreen;
@@ -63,6 +65,14 @@ public class CertificateFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         this.binding = FragmentCertificateBinding.inflate(inflater);
+        final ERole currentRole = UserService.getCurrRole();
+
+        if(currentRole != ERole.ROLE_ADMIN) {
+            binding.btnAdd.setVisibility(View.GONE);
+        }
+        else {
+            enableSwipeToDelete();
+        }
 
         this.binding.btnAdd.setOnClickListener(view -> {
             Intent intent = new Intent(getContext(), CreateCertificateActivity.class);
@@ -72,7 +82,6 @@ public class CertificateFragment extends Fragment {
         this.adapter = new CertificateAdapter(getContext());
         this.binding.recyclerViewEditStudentCertificates.setAdapter(this.adapter);
         this.binding.recyclerViewEditStudentCertificates.setLayoutManager(new LinearLayoutManager(getContext()));
-        enableSwipeToDelete();
 
         fetchCertificates();
 

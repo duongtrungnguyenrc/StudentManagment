@@ -21,16 +21,24 @@ import android.widget.PopupMenu;
 import android.widget.PopupWindow;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.main.usermanagement.R;
 import com.main.usermanagement.callback.ActionCallback;
 import com.main.usermanagement.callback.BottomSheetActionHandlerCallback;
 import com.main.usermanagement.callback.RecyclerViewActionCallback;
 import com.main.usermanagement.callback.SwipeToDeleteCallback;
+import com.main.usermanagement.databinding.FragmentCertificateBinding;
+import com.main.usermanagement.databinding.FragmentDashboardBinding;
+import com.main.usermanagement.models.entities.UserProfile;
+import com.main.usermanagement.models.enumerations.ERole;
 import com.main.usermanagement.models.enumerations.EStudentSortDirection;
 import com.main.usermanagement.services.DebounceService;
 import com.main.usermanagement.services.FileService;
+import com.main.usermanagement.services.UserService;
 import com.main.usermanagement.ui.activities.AddStudentActivity;
 import com.main.usermanagement.adapter.StudentAdapter;
 import com.main.usermanagement.models.entities.Student;
@@ -45,14 +53,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class DashboardFragment extends Fragment {
-
-    private FloatingActionButton fltBtnAdd;
-    private ImageButton btnSearchMenu;
-    private EditText edtSearch;
-    private RecyclerView studentRecyclerView;
     private  SkeletonScreen skeletonScreen;
     private StudentAdapter adapter;
     private StudentService service;
+
+    private FragmentDashboardBinding binding;
+    private final FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+
 
     public static class Init {
         private static DashboardFragment instance = null;
@@ -75,15 +82,28 @@ public class DashboardFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_dashboard, container, false);
-        this.edtSearch = view.findViewById(R.id.edt_search);
-        this.studentRecyclerView = view.findViewById(R.id.student_recycler_view);
-        this.fltBtnAdd = view.findViewById(R.id.btn_add);
-        this.btnSearchMenu = view.findViewById(R.id.btn_search_menu);
+        this.binding = FragmentDashboardBinding.inflate(inflater);
 
         FirebaseApp.initializeApp(getContext());
 
-        this.fltBtnAdd.setOnClickListener(button -> {
+        new UserService(getContext()).getUserProfile(currentUser.getUid(), new ActionCallback<UserProfile>() {
+            @Override
+            public void onSuccess(UserProfile profile) {
+
+                if(profile.getImage() != null && !profile.getImage().isEmpty()) {
+                    Glide.with(getContext())
+                            .load(profile.getImage())
+                            .into(binding.imgAvatar);
+                }
+            }
+
+            @Override
+            public void onError(Exception e) {
+                ActionCallback.super.onError(e);
+            }
+        });
+
+        binding.btnAdd.setOnClickListener(button -> {
             Intent intent = new Intent(getActivity(), AddStudentActivity.class);
             startActivityForResult(intent, 111);
         });
@@ -131,20 +151,20 @@ public class DashboardFragment extends Fragment {
                 }
             }
         });
-        studentRecyclerView.setAdapter(adapter);
-        studentRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        binding.studentRecyclerView.setAdapter(adapter);
+        binding.studentRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         enableSwipeToDelete();
 
         this.service = new StudentService();
         fetchStudents(service);
 
-        this.edtSearch.addTextChangedListener(new DebounceService(text -> studentsFilter(text.toString())));
+        binding.edtSearch.addTextChangedListener(new DebounceService(text -> studentsFilter(text.toString())));
 
-        this.btnSearchMenu.setOnClickListener(button -> {
-            showSearchPopupMenu(getContext(), this.btnSearchMenu);
+        binding.btnSearchMenu.setOnClickListener(button -> {
+            showSearchPopupMenu(getContext(), binding.btnSearchMenu);
         });
 
-        return view;
+        return binding.getRoot();
     }
 
     @Override
@@ -178,7 +198,7 @@ public class DashboardFragment extends Fragment {
     }
 
     private void showSkeleton() {
-        this.skeletonScreen = Skeleton.bind(studentRecyclerView)
+        this.skeletonScreen = Skeleton.bind(binding.studentRecyclerView)
                 .adapter(this.adapter)
                 .load(R.layout.layout_skeleton_student)
                 .count(10)
@@ -219,7 +239,7 @@ public class DashboardFragment extends Fragment {
         };
 
         ItemTouchHelper itemTouchhelper = new ItemTouchHelper(swipeToDeleteCallback);
-        itemTouchhelper.attachToRecyclerView(studentRecyclerView);
+        itemTouchhelper.attachToRecyclerView(binding.studentRecyclerView);
     }
 
     private void showSearchPopupMenu(Context context, View anchorView) {

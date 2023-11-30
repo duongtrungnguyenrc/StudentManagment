@@ -55,9 +55,10 @@
                     android:textSize="14sp" />
 
                 <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@id/img_avatar"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
-                    android:src="@drawable/couple" />
+                    android:src="@drawable/user" />
             </LinearLayout>
 
         </LinearLayout>

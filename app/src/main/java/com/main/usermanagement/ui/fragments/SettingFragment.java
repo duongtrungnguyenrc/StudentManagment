@@ -57,12 +57,17 @@ public class SettingFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.currentUser = FirebaseAuth.getInstance().getCurrentUser();
-
     }
-
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         this.binding = FragmentSettingBinding.inflate(inflater);
+
+        ERole currentRole = UserService.getCurrRole();
+
+        if(currentRole != ERole.ROLE_ADMIN) {
+            binding.itemAuthentication.setVisibility((View.GONE));
+            binding.itemGrantAccount.setVisibility(View.GONE);
+        }
 
         binding.itemAccount.setOnClickListener(item -> {
             Intent intent = new Intent(getContext(), userInformationActivity.class);

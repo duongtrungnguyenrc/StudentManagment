@@ -5,6 +5,8 @@ import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.annotation.Nullable;
+
 import com.main.usermanagement.models.enumerations.ERole;
 import com.main.usermanagement.models.enumerations.EStatus;
 

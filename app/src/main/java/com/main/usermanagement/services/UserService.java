@@ -148,10 +148,14 @@ public class UserService {
                 }).addOnFailureListener(action::onError);
             });
         }
+        else {
+            userProfileCollection.document(uid).update(updateProfile)
+                    .addOnSuccessListener(unused -> action.onSuccess())
+                    .addOnFailureListener(action::onError);
+        }
     }
 
     public void deleteUser(String uid, ActionCallback<Object> action) {
-//        this.firebaseAuth.get
         userProfileCollection.document(uid).delete()
                 .addOnSuccessListener(unused -> action.onSuccess())
                 .addOnFailureListener(action::onError);

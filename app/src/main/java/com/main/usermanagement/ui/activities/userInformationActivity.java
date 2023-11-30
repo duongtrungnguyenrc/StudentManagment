@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.view.View;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -16,6 +17,7 @@ import com.main.usermanagement.R;
 import com.main.usermanagement.callback.ActionCallback;
 import com.main.usermanagement.databinding.ActivityUserInformationBinding;
 import com.main.usermanagement.models.entities.UserProfile;
+import com.main.usermanagement.models.enumerations.ERole;
 import com.main.usermanagement.services.UserService;
 
 import java.util.HashMap;
@@ -25,7 +27,7 @@ public class userInformationActivity extends AppCompatActivity {
 
     private ActivityUserInformationBinding binding;
 
-    private FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+    private final FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
     private Uri avatarUri;
 
@@ -35,13 +37,23 @@ public class userInformationActivity extends AppCompatActivity {
         this.binding = ActivityUserInformationBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        final ERole currentRole = UserService.getCurrRole();
+
         new UserService(getApplicationContext()).getUserProfile(currentUser.getUid(), new ActionCallback<UserProfile>() {
             @Override
             public void onSuccess(UserProfile profile) {
 
-                Glide.with(getApplicationContext())
-                        .load(profile.getImage())
-                        .into(binding.imgAvatar);
+                if(profile.getImage() != null && !profile.getImage().isEmpty()) {
+                    Glide.with(getApplicationContext())
+                            .load(profile.getImage())
+                            .into(binding.imgAvatar);
+                }
+
+                if(currentRole != ERole.ROLE_ADMIN) {
+                    binding.edtName.setVisibility(View.GONE);
+                    binding.edtAge.setVisibility(View.GONE);
+                    binding.edtPhone.setVisibility(View.GONE);
+                }
 
                 binding.txtHeadingName.setText(profile.getName());
                 binding.txtHeadingEmail.setText(currentUser.getEmail());

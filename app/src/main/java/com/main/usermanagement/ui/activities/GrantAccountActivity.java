@@ -58,9 +58,9 @@ public class GrantAccountActivity extends AppCompatActivity {
                             binding.inputPhone.getText().toString(),
                             EStatus.NORMAL,
                             ERole.valueOf(binding.spinnerRole.getSelectedItem().toString()),
-                            avatarUri.toString()
+                            (avatarUri != null ? avatarUri.toString() : null)
                     ),
-                    new ActionCallback() {
+                    new ActionCallback<Object>() {
 
                         @Override
                         public void onSuccess() {
