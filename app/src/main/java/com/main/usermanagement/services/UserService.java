@@ -1,13 +1,17 @@
 package com.main.usermanagement.services;
 
+import static android.content.ContentValues.TAG;
+
 import android.content.Context;
 import android.net.Uri;
+import android.util.Log;
 
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
@@ -47,6 +51,7 @@ public class UserService {
                 FirebaseUser account = firebaseAuth.getCurrentUser();
                 assert account != null;
                 createProfile(account.getUid(), newUserProfile, action);
+                newUserProfile.setId(account.getUid());
             } else {
                 action.onError(task.getException());
             }
@@ -54,6 +59,7 @@ public class UserService {
     }
 
     private void createProfile(String id, UserProfile newUserProfile, ActionCallback<Object> action) {
+        newUserProfile.setId(id);
         if (newUserProfile.getImage() != null) {
             uploadImage(Uri.parse(newUserProfile.getImage())).addOnSuccessListener(taskSnapshot -> {
                 Task<Uri> downloadUrlTask = taskSnapshot.getStorage().getDownloadUrl();
@@ -154,12 +160,38 @@ public class UserService {
                     .addOnFailureListener(action::onError);
         }
     }
-
-    public void deleteUser(String uid, ActionCallback<Object> action) {
-        userProfileCollection.document(uid).delete()
-                .addOnSuccessListener(unused -> action.onSuccess())
-                .addOnFailureListener(action::onError);
+    public void deleteUser(String userId, ActionCallback<Object> action) {
+        if (userId != null) {
+            userProfileCollection.document(userId)
+                    .delete()
+                    .addOnSuccessListener(unused -> {
+                        Log.d("DeleteUser", "User deleted successfully");
+                        action.onSuccess();
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e("DeleteUser", "Failed to delete user", e);
+                        action.onError(e);
+                    });
+        } else {
+            action.onError(new NullPointerException("User ID is null"));
+        }
     }
+
+//    public void deleteUser(String uid, ActionCallback<Object> action) {
+//        userProfileCollection.document(uid).delete()
+//                .addOnSuccessListener(unused -> action.onSuccess())
+//                .addOnFailureListener(action::onError);
+//    }
+//    public void deleteUser(String documentPath, ActionCallback<Object> action) {
+//        if (documentPath != null) {
+//            DocumentReference documentReference = userProfileCollection.document(documentPath);
+//            documentReference.delete()
+//                    .addOnSuccessListener(unused -> action.onSuccess())
+//                    .addOnFailureListener(action::onError);
+//        } else {
+//            action.onError(new NullPointerException("Document path is null"));
+//        }
+//    }
 
     public static ERole getCurrRole() {
         return currRole;

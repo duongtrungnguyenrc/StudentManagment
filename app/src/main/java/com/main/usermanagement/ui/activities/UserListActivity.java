@@ -1,6 +1,12 @@
-package com.main.usermanagement.ui.activities;//package com.main.usermanagement.ui.activities;
+package com.main.usermanagement.ui.activities;
+
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -11,23 +17,15 @@ import com.main.usermanagement.adapter.UserAdapter;
 import com.main.usermanagement.models.entities.UserProfile;
 import com.main.usermanagement.services.UserService;
 import com.main.usermanagement.callback.ActionCallback;
-import com.main.usermanagement.ui.fragments.SettingFragment;
 
 import java.util.List;
-
-import android.os.Parcelable;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.Toast;
-
-
 
 public class UserListActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
     private UserAdapter userAdapter;
     private UserService userService;
+    private ImageButton deleteButton;
     private ImageButton btnBack;
 
     @Override
@@ -47,18 +45,33 @@ public class UserListActivity extends AppCompatActivity {
         // Fetch user profiles from the server
         fetchUserProfiles();
 
+        deleteButton = findViewById(R.id.btn_remove);
         btnBack = findViewById(R.id.btnBack);
+        deleteButton.setVisibility(View.GONE); // Ẩn nút delete ban đầu
 
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                SettingFragment settingFragment = new SettingFragment();
-//                getSupportFragmentManager().beginTransaction()
-//                        .replace(android.R.id.content, settingFragment)
-//                        .addToBackStack(null)
-//                        .commit();
-                Intent intent = new Intent(UserListActivity.this, MainActivity.class);
+                Intent intent = new Intent(UserListActivity.this,MainActivity.class);
                 startActivity(intent);
+            }
+        });
+        deleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                deleteSelectedItems();
+
+            }
+        });
+
+        userAdapter.setOnItemSelectedListener(new UserAdapter.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(boolean hasSelectedItems) {
+                if (hasSelectedItems) {
+                    deleteButton.setVisibility(View.VISIBLE); // Hiển thị nút delete nếu có mục đã chọn
+                } else {
+                    deleteButton.setVisibility(View.GONE); // Ẩn nút delete nếu không có mục đã chọn
+                }
             }
         });
     }
@@ -77,6 +90,31 @@ public class UserListActivity extends AppCompatActivity {
                 Toast.makeText(UserListActivity.this, "Failed to fetch user profiles", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void deleteSelectedItems() {
+        List<UserProfile> selectedItems = userAdapter.getSelectedItems();
+
+        for (UserProfile selectedItem : selectedItems) {
+            userService.deleteUser(selectedItem.getId(), new ActionCallback<Object>() {
+                @Override
+                public void onSuccess() {
+                    // Remove the deleted item from the adapter
+                    userAdapter.removeUser(selectedItem);
+                    Toast.makeText(UserListActivity.this, "Deleted selected items", Toast.LENGTH_SHORT).show();
+
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    // Show an error message
+                    Toast.makeText(UserListActivity.this, "Failed to delete user", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+        }
+
+        // Show a success message
     }
 
     public void onUserItemClick(UserProfile userProfile) {

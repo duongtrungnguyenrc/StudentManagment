@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:weightSum="12"
     android:orientation="vertical">
 
@@ -17,18 +18,19 @@
             android:background="#FFFF"
             android:src="@drawable/ic_back30" />
 
-<!--        <TextView-->
-<!--            android:id="@+id/textView"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:textSize="25dp"-->
-<!--            android:layout_gravity="center"-->
-<!--            android:text="List User" />-->
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rVListUser"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="11"/>
+        android:layout_weight="11.25"/>
+    <ImageButton
+        android:id="@+id/btn_remove"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.75"
+        android:background="#e10907"
+        android:padding="10dp"
+        app:srcCompat="@drawable/ic_trash_light_24" />
 </LinearLayout>

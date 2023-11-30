@@ -15,12 +15,14 @@ import java.util.Date;
 import java.util.List;
 
 public class UserProfile implements Parcelable {
+    private String id;
     private String name;
     private int age;
     private String phone;
     private EStatus status;
     private ERole role;
     private String image;
+    private boolean isSelected;
     private List<Date> accessHistory = new ArrayList<>();
 
     public UserProfile() {}
@@ -127,5 +129,21 @@ public class UserProfile implements Parcelable {
 
     public void setImage(String image) {
         this.image = image;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setSelected(boolean selected) {
+        isSelected = selected;
+    }
+
+    public boolean isSelected() {
+        return isSelected;
     }
 }

@@ -1,4 +1,4 @@
-package com.main.usermanagement.adapter;//package com.main.usermanagement.adapter;//package com.main.usermanagement.adapter;
+package com.main.usermanagement.adapter;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,19 +11,17 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.main.usermanagement.R;
 import com.main.usermanagement.models.entities.UserProfile;
-import com.main.usermanagement.ui.activities.UserListActivity;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder> {
 
     private List<UserProfile> userProfiles = new ArrayList<>();
-
-    public void setUserProfiles(List<UserProfile> userProfiles) {
-        this.userProfiles = userProfiles;
-        notifyDataSetChanged();
-    }
+    private Set<UserProfile> selectedItems = new HashSet<>();
+    private OnItemSelectedListener setOnItemSelectedListener;
 
     @NonNull
     @Override
@@ -33,9 +31,21 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     }
 
     @Override
-    public void onBindViewHolder(@NonNull UserViewHolder holder, int position) {
+    public void onBindViewHolder(UserViewHolder holder, int position) {
         UserProfile userProfile = userProfiles.get(position);
         holder.bind(userProfile);
+        holder.checkBox.setChecked(selectedItems.contains(userProfile));
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (selectedItems.contains(userProfile)) {
+                    selectedItems.remove(userProfile);
+                } else {
+                    selectedItems.add(userProfile);
+                }
+                notifyItemChanged(position);
+            }
+        });
     }
 
     @Override
@@ -43,15 +53,37 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         return userProfiles.size();
     }
 
-    class UserViewHolder extends RecyclerView.ViewHolder {
+    public void setUserProfiles(List<UserProfile> userProfiles) {
+        this.userProfiles = userProfiles;
+        notifyDataSetChanged();
+    }
 
+    public void removeUser(UserProfile userProfile) {
+        userProfiles.remove(userProfile);
+        notifyDataSetChanged();
+    }
+
+    public List<UserProfile> getSelectedItems() {
+        return new ArrayList<>(selectedItems);
+    }
+
+    public void setOnItemSelectedListener(OnItemSelectedListener onItemSelectedListener) {
+        this.setOnItemSelectedListener = onItemSelectedListener;
+        notifyDataSetChanged();
+    }
+
+    public interface OnItemSelectedListener {
+        void onItemSelected(boolean hasSelectedItems);
+    }
+
+    class UserViewHolder extends RecyclerView.ViewHolder {
 
         private TextView txtUserName;
         private TextView txtPhone;
         private TextView txtStatus;
-        private CheckBox cbChecked;
         private CheckBox checkBox;
         private TextView txtRole;
+
         public UserViewHolder(@NonNull View itemView) {
             super(itemView);
             txtUserName = itemView.findViewById(R.id.txt_name);
@@ -59,24 +91,25 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
             txtPhone = itemView.findViewById(R.id.txt_phone);
             txtStatus = itemView.findViewById(R.id.txt_status);
             txtRole = itemView.findViewById(R.id.txt_role);
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int position = getAdapterPosition();
-                    if (position != RecyclerView.NO_POSITION) {
-                        UserProfile userProfile = userProfiles.get(position);
-                        ((UserListActivity) itemView.getContext()).onUserItemClick(userProfile);
-                    }
-                }
-            });
         }
 
         public void bind(UserProfile user) {
             txtUserName.setText(user.getName());
             txtPhone.setText(user.getPhone());
             txtRole.setText(user.getRole().name());
-//            txtStatus.setText(user.getStatus().ordinal());
 
+            checkBox.setOnCheckedChangeListener(null);
+            checkBox.setChecked(selectedItems.contains(user));
+            checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                if (isChecked) {
+                    selectedItems.add(user);
+                } else {
+                    selectedItems.remove(user);
+                }
+                if (setOnItemSelectedListener != null) {
+                    setOnItemSelectedListener.onItemSelected(!selectedItems.isEmpty());
+                }
+            });
         }
     }
 }
