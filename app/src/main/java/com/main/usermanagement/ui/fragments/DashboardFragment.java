@@ -87,7 +87,7 @@ public class DashboardFragment extends Fragment {
 
         final ERole currentRole = UserService.getCurrRole();
 
-        if(currentRole != ERole.ROLE_ADMIN) {
+        if(currentRole != ERole.ROLE_ADMIN || currentRole != ERole.ROLE_MANAGER) {
             binding.btnAdd.setVisibility(View.GONE);
         }
         else {
@@ -139,6 +139,7 @@ public class DashboardFragment extends Fragment {
                                     @Override
                                     public void onSuccess() {
                                         ActionCallback.super.onSuccess();
+                                        popupWindow.dismiss();
                                         Toast.makeText(getActivity(), "successfully to delete " + student.getName(), Toast.LENGTH_LONG).show();
                                     }
 
