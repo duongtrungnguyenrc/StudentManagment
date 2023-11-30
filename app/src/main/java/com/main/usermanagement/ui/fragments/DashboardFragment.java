@@ -77,6 +77,7 @@ public class DashboardFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        FirebaseApp.initializeApp(getContext());
     }
 
     @Override
@@ -84,7 +85,14 @@ public class DashboardFragment extends Fragment {
                              Bundle savedInstanceState) {
         this.binding = FragmentDashboardBinding.inflate(inflater);
 
-        FirebaseApp.initializeApp(getContext());
+        final ERole currentRole = UserService.getCurrRole();
+
+        if(currentRole != ERole.ROLE_ADMIN) {
+            binding.btnAdd.setVisibility(View.GONE);
+        }
+        else {
+            enableSwipeToDelete();
+        }
 
         new UserService(getContext()).getUserProfile(currentUser.getUid(), new ActionCallback<UserProfile>() {
             @Override
@@ -153,7 +161,6 @@ public class DashboardFragment extends Fragment {
         });
         binding.studentRecyclerView.setAdapter(adapter);
         binding.studentRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        enableSwipeToDelete();
 
         this.service = new StudentService();
         fetchStudents(service);
